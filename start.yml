@@ -1,0 +1,4 @@
+---
+- include: setup_dependencies.yml
+- include: setup_redis_server.yml
+- include: test_redis_server.yml

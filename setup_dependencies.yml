@@ -1,0 +1,52 @@
+---
+- name: Setup Redis Server
+  hosts: redis_master
+  
+  tasks:
+    - name: Ensure python3 is installed
+      sudo: true
+      apt:
+        pkg: python3
+        state: latest
+      
+    - name: Ensure python-pip is installed
+      sudo: true
+      apt:
+        pkg: python3-pip
+        state: latest
+
+    - name: Ensure that the ~/.envs directory exists
+      file:
+        path: /home/vagrant/.envs
+        state: directory
+        owner: vagrant
+        group: vagrant
+
+    - name: Copy requirements.txt file to redis server
+      copy:
+        src: config/requirements.txt
+        dest: /home/vagrant/requirements.txt
+        owner: vagrant
+        group: vagrant
+        mode: 0644
+
+    - name: Install virtualenv via pip
+      sudo: true
+      pip:
+        name: virtualenv
+        executable: pip3
+
+    - name: Create python 3.4 virtual environment
+      sudo: true
+      pip:
+        virtualenv: /home/vagrant/.envs/pyredisenv
+        virtualenv_python: python3.4
+        requirements: /home/vagrant/requirements.txt
+
+    - name: Copy redis test script
+      copy:
+        src: tests/redis_tests.py
+        dest: /home/vagrant/redis_tests.py
+        owner: vagrant
+        group: vagrant
+        mode: 0644

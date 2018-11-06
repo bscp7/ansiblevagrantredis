@@ -1,0 +1,42 @@
+---
+- name: Install Redis
+  hosts: redis_master
+  
+  vars:
+    redis_port: 6379
+    redis_databases: 1
+    redis_bind: "{{ ansible_eth1.ipv4.address }}"
+
+  tasks:
+    - debug: var=hostvars[inventory_hostname]['ansible_eth1']['ipv4']
+
+    - name: Ensure Redis is present
+      sudo: true
+      apt:
+        pkg: redis-server
+        state: latest
+      
+    - name: Ensure Redis is started
+      sudo: true    
+      service:
+        name: redis-server
+        state: started
+        enabled: yes
+
+    - name: Ensure Redis Configuration
+      sudo: true
+      template:
+        src: config/redis.conf.j2
+        dest: /etc/redis/redis.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Redis Restart
+
+  handlers:
+    - name: Redis Restart
+      sudo: true
+      service:
+        name: redis-server
+        state: restarted
+        enabled: yes

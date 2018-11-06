@@ -1,0 +1,13 @@
+---
+- name: Install Redis
+  hosts: redis_master
+
+  tasks:
+    - name: Run a redis test script
+      command: /home/vagrant/.envs/pyredisenv/bin/python redis_tests.py
+      register: output
+      args:
+        chdir: /home/vagrant
+
+    - debug: var=output['stdout']
+    - debug: var=output['stderr']

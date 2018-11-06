@@ -1,0 +1,26 @@
+---
+# ANSIBLE: Allow login with ssh public key
+- name: Allow login with SSH Public Key
+  hosts: all
+  vars:
+    username: vagrant
+
+  tasks:
+
+    - name: Ensure the ~/.ssh directory exists
+      file:
+        path: "/home/vagrant/.ssh"
+        state: directory
+        owner: vagrant
+        group: vagrant
+
+    - name: Check if authorized_keys file present
+      file:
+        path: /home/vagrant/.ssh/authorized_keys
+        state: file
+
+    - name: Set authorized key for user vagrant copying it from current user
+      authorized_key:
+        user: vagrant
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
